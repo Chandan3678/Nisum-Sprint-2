@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Order Details</title>
+  <link rel="stylesheet" th:href="@{/static/css/orderStyles.css}">
+</head>
+<body>
+<div class="container">
+  <div class="order-summary">
+    <h2>Order Details - #<span th:text="${order.orderId}">1001</span></h2>
+    <p><strong>Order Date:</strong> <span th:text="${order.orderDate}">01-05-2025</span></p>
+    <p><strong>Total:</strong> ₹<span th:text="${order.orderTotal}">4898</span></p>
+    <p><strong>Status:</strong> <span th:text="${order.orderStatus}">Shipped</span></p>
+  </div>
+
+  <div class="action-buttons">
+    <button class="btn btn-primary" onclick="trackPackage()">Track Package</button>
+    <button class="btn btn-secondary" onclick="openRatingModal()">Rate Order</button>
+    <button class="btn btn-success" th:onclick="'downloadInvoice(' + ${order.orderId} + ')'">
+      Download Invoice
+    </button>
+    <button class="btn btn-info" th:if="${order.orderStatus == 'Delivered'}"
+            onclick="reorder()">Buy it Again</button>
+  </div>
+
+  <div class="items-section">
+    <h3>Order Items</h3>
+    <table class="items-table">
+      <thead>
+      <tr>
+        <th>SKU</th>
+        <th>Quantity</th>
+        <th>Unit Price</th>
+        <th>Discount</th>
+        <th>Final Price</th>
+        <th>Size</th>
+        <th>Color</th>
+        <th>Status</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr th:each="item : ${items}">
+        <td th:text="${item.sku}">SHRT-MN1</td>
+        <td th:text="${item.quantity}">2</td>
+        <td>₹<span th:text="${item.unitPrice}">999</span></td>
+        <td>₹<span th:text="${item.discount}">100</span></td>
+        <td>₹<span th:text="${item.finalPrice}">1798</span></td>
+        <td th:text="${item.size}">M</td>
+        <td th:text="${item.color}">Blue</td>
+        <td th:text="${item.status}">Shipped</td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Shipment section with shipment items -->
+  <div class="shipment-section" th:if="${shipments != null}">
+    <h3>Shipments</h3>
+    <div th:each="shipment : ${shipments}" class="shipment-card">
+      <p><strong>Shipment Status:</strong> <span th:text="${shipment.shipmentStatus}"></span></p>
+      <p><strong>Tracking ID:</strong> <span th:text="${shipment.shipmentTrackingId}"></span></p>
+      <p><strong>Shipment Date:</strong> <span th:text="${shipment.shipmentDate}"></span></p>
+      <p><strong>Delivered Date:</strong> <span th:text="${shipment.deliveredDate}"></span></p>
+      <div th:if="${shipment.shipmentItems != null}">
+        <h4>Shipment Items</h4>
+        <table class="items-table">
+          <thead>
+          <tr>
+            <th>Shipment Item ID</th>
+            <th>Order Item ID</th>
+            <th>Shipped Quantity</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr th:each="si : ${shipment.shipmentItems}">
+            <td th:text="${si.shipmentItemId}"></td>
+            <td th:text="${si.orderItemId}"></td>
+            <td th:text="${si.shippedQty}"></td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Rating Modal -->
+<div id="ratingModal" class="modal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h3>Rate this Order</h3>
+    <div class="star-rating">
+      <span class="star" data-rating="1">★</span>
+      <span class="star" data-rating="2">★</span>
+      <span class="star" data-rating="3">★</span>
+      <span class="star" data-rating="4">★</span>
+      <span class="star" data-rating="5">★</span>
+    </div>
+    <button onclick="submitRating()">Submit Rating</button>
+  </div>
+</div>
+
+<!-- Tracking Modal -->
+<div id="trackingModal" class="modal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h3>Package Tracking</h3>
+    <div id="trackingContent"></div>
+  </div>
+</div>
+
+<script th:src="@{/static/js/orderDetails.js}"></script>
+</body>
+</html>
